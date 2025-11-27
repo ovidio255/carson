@@ -17,7 +17,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-    'https://carson-frontend.onrender.com' // Reemplaza con tu URL real del frontend
+    'https://carson-4870.onrender.com'
   ],
   credentials: true
 }));
