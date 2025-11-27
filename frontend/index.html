@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARSON - Gestión de Inventario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-4xl font-bold">CARSON</h1>
+                        <p class="text-blue-100">Sistema de Gestión de Inventario de Carros</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-blue-100">Estado del servidor: <span id="serverStatus" class="font-semibold text-green-300">●</span></p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 py-8">
+            <!-- Estadísticas -->
+            <div id="stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Total de Carros</p>
+                            <p class="text-3xl font-bold text-gray-900" id="totalCarros">0</p>
+                        </div>
+                        <i class="fas fa-car text-4xl text-blue-200"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Costo Total</p>
+                            <p class="text-3xl font-bold text-gray-900" id="costoTotal">$0</p>
+                        </div>
+                        <i class="fas fa-dollar-sign text-4xl text-green-200"></i>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-600 text-sm font-medium">Costo Promedio</p>
+                            <p class="text-3xl font-bold text-gray-900" id="costoPromedio">$0</p>
+                        </div>
+                        <i class="fas fa-chart-bar text-4xl text-purple-200"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Acciones -->
+            <div class="flex gap-4 mb-8">
+                <button id="btnNuevoCarro" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition">
+                    <i class="fas fa-plus mr-2"></i>Nuevo Carro
+                </button>
+                <button id="btnActualizar" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition">
+                    <i class="fas fa-sync mr-2"></i>Actualizar
+                </button>
+            </div>
+
+            <!-- Tabla de Carros -->
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-900">Inventario de Carros</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Placa</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Marca</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Modelo</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Año</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Color</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Costo Reparación</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Fecha Ingreso</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="carrosTable" class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 text-center text-gray-500" colspan="8">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para crear/editar carro -->
+    <div id="modalCarro" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-900" id="modalTitle">Nuevo Carro</h3>
+                <button id="btnCloseModal" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <form id="formCarro" class="px-6 py-4 space-y-4">
+                <input type="hidden" id="carroId">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Marca *</label>
+                        <input type="text" id="marca" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Toyota, Honda, etc." required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Modelo *</label>
+                        <input type="text" id="modelo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Corolla, Civic, etc." required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Año *</label>
+                        <input type="number" id="año" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="2024" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Placa *</label>
+                        <input type="text" id="placa" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase" placeholder="ABC-1234" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Color *</label>
+                        <input type="text" id="color" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Rojo, Blanco, etc." required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Costo Reparación *</label>
+                        <input type="number" id="costoReparacion" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de Daños *</label>
+                    <textarea id="descripcionDaños" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="4" placeholder="Describe los daños o trabajos a realizar..." required></textarea>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
+                        <i class="fas fa-save mr-2"></i>Guardar
+                    </button>
+                    <button type="button" id="btnCancelModal" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles -->
+    <div id="modalDetalles" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-gray-900">Detalles del Carro</h3>
+                <button id="btnCloseDetalles" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div id="detallesContent" class="px-6 py-4 space-y-4">
+                <!-- Los detalles se cargarán aquí -->
+            </div>
+
+            <div class="px-6 py-4 border-t border-gray-200 flex gap-4">
+                <button id="btnEditarCarro" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition">
+                    <i class="fas fa-edit mr-2"></i>Editar
+                </button>
+                <button id="btnEliminarCarro" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition">
+                    <i class="fas fa-trash mr-2"></i>Eliminar
+                </button>
+                <button id="btnCerrarDetalles" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
