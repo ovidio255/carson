@@ -1,4 +1,7 @@
-const API_BASE_URL = "http://localhost:5000/api";
+// Detectar si estamos en desarrollo o producción
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? "http://localhost:5000/api"
+    : "https://carson-backend.onrender.com/api"; // Reemplaza con tu URL real de Render
 
 // Estado global
 let carros = [];

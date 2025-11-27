@@ -13,7 +13,14 @@ const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/carson
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://carson-frontend.onrender.com' // Reemplaza con tu URL real del frontend
+  ],
+  credentials: true
+}));
 
 // Conectar a MongoDB
 mongoose

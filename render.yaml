@@ -17,20 +17,14 @@ services:
     healthCheckPath: /api/health
     
   # Frontend estático
-  - type: static
+  - type: web
     name: carson-frontend
     runtime: static
     region: oregon
     plan: free
-    buildCommand: cd frontend && npm install && npx tailwindcss -i styles.css -o dist/styles.css --minify
+    buildCommand: cd frontend && npm install && npx tailwindcss -i styles.css -o styles.css --minify
     staticPublishPath: ./frontend
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: carson-backend
-          envVarKey: RENDER_EXTERNAL_URL
