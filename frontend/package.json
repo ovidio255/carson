@@ -1,4 +1,10 @@
 {
+  "name": "carson-frontend",
+  "version": "1.0.0",
+  "description": "Frontend para CARSON - Sistema de Gestión de Inventario de Carros",
+  "scripts": {
+    "build": "npx tailwindcss -i styles.css -o styles.css --minify"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.22",
     "postcss": "^8.5.6",

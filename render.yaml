@@ -22,7 +22,7 @@ services:
     runtime: static
     region: oregon
     plan: free
-    buildCommand: cd frontend && npm install && npx tailwindcss -i styles.css -o styles.css --minify
+    buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend
     routes:
       - type: rewrite
