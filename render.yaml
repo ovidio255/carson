@@ -1,0 +1,36 @@
+services:
+  # Backend API
+  - type: web
+    name: carson-backend
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+    healthCheckPath: /api/health
+    
+  # Frontend estático
+  - type: static
+    name: carson-frontend
+    runtime: static
+    region: oregon
+    plan: free
+    buildCommand: cd frontend && npm install && npx tailwindcss -i styles.css -o dist/styles.css --minify
+    staticPublishPath: ./frontend
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: carson-backend
+          envVarKey: RENDER_EXTERNAL_URL
